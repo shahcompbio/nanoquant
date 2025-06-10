@@ -241,5 +241,11 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "gtf": {
+            "type": "string",
+            "description": "transcriptome gtf"
+        }
+    }
 }
