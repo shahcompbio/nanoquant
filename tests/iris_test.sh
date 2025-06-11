@@ -17,8 +17,8 @@ module load java/20.0.1
 outdir=/data1/shahs3/users/preskaa/SarcAtlas/data/APS033_ont_transcript_assembly/nanoquant_test
 results_dir=${outdir}/results
 pipelinedir=$HOME/nanoquant
-samplesheet=${pipelinedir}/iris_samplesheet.csv
-fasta=/data1/shahs3/isabl_data_lake/assemblies/GRCh38-P14/GRCh38.primary_assembly.genome.fa
+samplesheet=${pipelinedir}/assets/iris_samplesheet.csv
+ref_genome=/data1/shahs3/isabl_data_lake/assemblies/GRCh38-P14/GRCh38.primary_assembly.genome.fa
 gtf=/data1/shahs3/isabl_data_lake/assemblies/GRCh38-P14/gencode.v45.primary_assembly.annotation.gtf
 
 mkdir -p ${results_dir}
