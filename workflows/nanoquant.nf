@@ -30,7 +30,7 @@ workflow NANOQUANT {
     //
     // MODULE: Run FastQC
     //
-    ch_samplesheet.view()
+    // ch_samplesheet.view()
     // extract cdna 
     GFFREAD(tuple([id: "cdna"], params.gtf), params.fasta)
     ch_versions = ch_versions.mix(GFFREAD.out.versions)

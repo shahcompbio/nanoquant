@@ -25,10 +25,11 @@ mkdir -p ${results_dir}
 cd ${outdir}
 
 nextflow run shahcompbio/nanoquant -r main -latest \
-    -profile singularity \
+    -profile singularity,slurm \
     -work-dir ${outdir}/work \
     --outdir ${outdir} \
     --input ${samplesheet} \
     --gtf ${gtf} \
     --fasta ${ref_genome} \
+    -with-report \
    -resume
