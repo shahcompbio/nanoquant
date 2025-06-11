@@ -32,4 +32,5 @@ nextflow run shahcompbio/nanoquant -r main -latest \
     --gtf ${gtf} \
     --fasta ${ref_genome} \
     -with-report \
+    -N preskaa@mskcc.org \
    -resume
