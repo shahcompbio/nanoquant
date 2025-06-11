@@ -5,6 +5,7 @@
 */
 include { GFFREAD                } from '../modules/nf-core/gffread/main'
 include { KALLISTO_INDEX         } from '../modules/nf-core/kallisto/index/main'
+include { BUSPARSE_TR2G          } from '../modules/local/busparse/tr2g/main'
 include { KALLISTO_QUANT         } from '../subworkflows/local/kallisto_quant/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
@@ -36,6 +37,9 @@ workflow NANOQUANT {
     // index
     KALLISTO_INDEX(GFFREAD.out.gffread_fasta)
     ch_versions = ch_versions.mix(KALLISTO_INDEX.out.versions)
+    // map transcripts to gene
+    BUSPARSE_TR2G(tuple([id: "tr2g"], params.gtf))
+
 
     // KALLISTO_QUANT(
     //     ch_samplesheet,
