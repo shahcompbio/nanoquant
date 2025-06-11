@@ -2,6 +2,7 @@
 process BUSPARSE_TR2G {
     tag "${meta.id}"
     label 'process_single'
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
 
     // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
     conda "${moduleDir}/environment.yml"
@@ -12,7 +13,7 @@ process BUSPARSE_TR2G {
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
-    tuple val(meta), path("tr2g.tsv"), emit: gene_map
+    tuple val(meta), path("*/tr2g.tsv"), emit: gene_map
     // TODO nf-core: List additional required output channels/values here
     path "versions.yml", emit: versions
 
@@ -27,7 +28,7 @@ library(BUSpaRse)
 tr2g_tg <- tr2g_gtf('transcripts.gtf',
                     get_transcriptome = FALSE,
                     save_filtered_gtf = FALSE,
-                    out_path = 'tr2g.tsv')
+                    out_path = 'tr2g')
 
 # Get package version and write to versions.yml
 busparse_version <- as.character(packageVersion('BUSpaRse'))
