@@ -40,13 +40,12 @@ workflow NANOQUANT {
     // map transcripts to gene
     BUSPARSE_TR2G(tuple([id: "tr2g"], params.gtf))
     ch_versions = ch_versions.mix(BUSPARSE_TR2G.out.versions)
-
-    // KALLISTO_QUANT(
-    //     ch_samplesheet,
-    //     params.gtf,
-    //     params.fasta,
-    // )
-    // ch_versions = ch_versions.mix(KALLISTO_QUANT.out.versions)
+    KALLISTO_QUANT(
+        ch_samplesheet,
+        KALLISTO_INDEX.out.index,
+        BUSPARSE_TR2G.out.gene_map,
+    )
+    ch_versions = ch_versions.mix(KALLISTO_QUANT.out.versions)
 
     //
     // Collate and save software versions
