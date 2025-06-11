@@ -24,7 +24,7 @@ gtf=/data1/shahs3/isabl_data_lake/assemblies/GRCh38-P14/gencode.v45.primary_asse
 mkdir -p ${results_dir}
 cd ${outdir}
 
-nextflow run shahcompbio/nanoquant -r latest \
+nextflow run shahcompbio/nanoquant -r main -latest \
     -profile singularity \
     -work-dir ${outdir}/work \
     --outdir ${outdir} \
