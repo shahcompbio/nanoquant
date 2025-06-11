@@ -1,2 +1,4 @@
-sample,fastq_1,fastq_2
+sample,fastq_1,fastq_dir
 SAMPLE_SINGLE_END,/Users/asherpreskasteinberg/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/SarcAtlas/APS033_nanoquant_test/TCDO-SAR-061-FT-A_14199-F-1_R1_001.downsampled.fastq.gz,
+SAMPLE_UNMERGED,,/Users/asherpreskasteinberg/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/SarcAtlas/APS033_nanoquant_test/unmerged_fastq
+SAMPLE_UNMERGED,,/Users/asherpreskasteinberg/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/SarcAtlas/APS033_nanoquant_test/unmerged_fastq1
