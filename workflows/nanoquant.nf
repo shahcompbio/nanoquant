@@ -6,6 +6,7 @@
 include { GFFREAD                } from '../modules/nf-core/gffread/main'
 include { KALLISTO_INDEX         } from '../modules/nf-core/kallisto/index/main'
 include { BUSPARSE_TR2G          } from '../modules/local/busparse/tr2g/main'
+include { CAT_LRFASTQ            } from '../modules/local/cat/lrfastq/main'
 include { KALLISTO_QUANT         } from '../subworkflows/local/kallisto_quant/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
@@ -40,13 +41,25 @@ workflow NANOQUANT {
     // map transcripts to gene
     BUSPARSE_TR2G(tuple([id: "tr2g"], params.gtf))
     ch_versions = ch_versions.mix(BUSPARSE_TR2G.out.versions)
-    ch_samplesheet.view()
-    // KALLISTO_QUANT(
-    //     ch_samplesheet,
-    //     KALLISTO_INDEX.out.index,
-    //     BUSPARSE_TR2G.out.gene_map,
-    // )
-    // ch_versions = ch_versions.mix(KALLISTO_QUANT.out.versions)
+    ch_samplesheet
+        .branch { meta, fastqs ->
+            merged: meta.single_end == true
+            unmerged: meta.single_end != true
+        }
+        .set { ch_fastq }
+    // ch_fastq.merged.view { meta, _fastq -> "${meta.id} is merged" }
+    // ch_fastq.unmerged.view { meta, _fastq -> "${meta.id} is unmerged" }
+    // merge unmerged fastqs
+    CAT_LRFASTQ(ch_fastq.unmerged)
+    ch_versions = ch_versions.mix(CAT_LRFASTQ.out.versions)
+    ch_merged_fastq = ch_fastq.merged.mix(CAT_LRFASTQ.out.fastq)
+    // ch_merged_fastq.view()
+    KALLISTO_QUANT(
+        ch_merged_fastq,
+        KALLISTO_INDEX.out.index,
+        BUSPARSE_TR2G.out.gene_map,
+    )
+    ch_versions = ch_versions.mix(KALLISTO_QUANT.out.versions)
 
     //
     // Collate and save software versions
