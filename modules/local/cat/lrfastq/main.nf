@@ -2,6 +2,7 @@
 process CAT_LRFASTQ {
     tag "${meta.id}"
     label 'process_single'
+    publishDir enabled: false
 
     // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
     conda "${moduleDir}/environment.yml"
