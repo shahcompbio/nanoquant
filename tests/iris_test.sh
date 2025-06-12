@@ -8,13 +8,13 @@
 #SBATCH --job-name=nanoquant
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=preskaa@mskcc.org
-#SBATCH --output=slurm%j_nanoquant.out
+#SBATCH --output=slurm%j_unmerged_nanoquant.out
 
 ## activate nf-core conda environment
 source /home/preskaa/miniforge3/bin/activate nf-core
 module load java/20.0.1
 ## specify params
-outdir=/data1/shahs3/users/preskaa/SarcAtlas/data/APS033_ont_transcript_assembly/nanoquant_test
+outdir=/data1/shahs3/users/preskaa/SarcAtlas/data/APS033_ont_transcript_assembly/nanoquant_unmerged_test
 results_dir=${outdir}/results
 pipelinedir=$HOME/nanoquant
 samplesheet=${pipelinedir}/assets/iris_samplesheet.csv
