@@ -11,7 +11,7 @@ process CAT_LRFASTQ {
         : 'community.wave.seqera.io/library/coreutils_grep_gzip_lbzip2_pruned:838ba80435a629f8'}"
 
     input:
-    tuple val(meta), path(dir, arity: "1..*")
+    tuple val(meta), path(dir, stageAs: "temp_fastq??", arity: "1..*")
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
