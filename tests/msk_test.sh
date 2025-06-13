@@ -17,4 +17,5 @@ nextflow run ${pipelinedir}/main.nf \
     --input ${samplesheet} \
     --gtf ${gtf} \
     --fasta ${ref_genome} \
+    --merge_samples \
     -resume

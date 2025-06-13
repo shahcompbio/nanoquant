@@ -2,20 +2,7 @@
 process KALLISTO_TCCQUANT {
     tag "${meta.id}"
     label 'process_medium'
-    publishDir "kallisto/${meta.id}", mode: 'copy', overwrite: true, saveAs: { filename ->
-        if (filename == "quant/abundance_1.h5") {
-            return "quant/abundance.h5"
-        }
-        else if (filename == "quant/abundance_1.tsv") {
-            return "quant/abundance.tsv"
-        }
-        else if (filename == "abundance.gene_1.tsv") {
-            return "quant/abundance.gene.tsv"
-        }
-        else {
-            return filename
-        }
-    }
+    publishDir "kallisto", mode: 'copy', overwrite: true
 
     // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
     conda "${moduleDir}/environment.yml"
@@ -31,10 +18,10 @@ process KALLISTO_TCCQUANT {
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
-    tuple val(meta), path("quant/abundance_1.h5"), emit: h5
-    tuple val(meta), path("quant/abundance_1.tsv"), emit: transcript_abundance
-    tuple val(meta), path("quant/abundance.gene_1.tsv"), emit: gene_abundance
-    tuple val(meta), path("quant"), emit: results
+    tuple val(meta), path("${meta.id}/abundance.h5"), emit: h5
+    tuple val(meta), path("${meta.id}/abundance.tsv"), emit: transcript_abundance
+    tuple val(meta), path("${meta.id}/abundance.gene.tsv"), emit: gene_abundance
+    tuple val(meta), path("${meta.id}"), emit: results
     // TODO nf-core: List additional required output channels/values here
     path "versions.yml", emit: versions
 
@@ -45,7 +32,6 @@ process KALLISTO_TCCQUANT {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    mkdir -p quant
     kallisto quant-tcc\\
         -t ${task.cpus} \\
         --long -P ONT \\
@@ -54,8 +40,14 @@ process KALLISTO_TCCQUANT {
         -f flens.txt \\
         -e output.ec.txt \\
         -g tr2g.tsv \\
-        -o quant \\
+        -o ${meta.id} \\
         -b 100 --matrix-to-files
+    # Rename files to desired names
+    cd ${meta.id}
+    mv abundance_1.h5 abundance.h5
+    mv abundance_1.tsv abundance.tsv
+    mv abundance.gene_1.tsv abundance.gene.tsv
+    cd ..
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         kallisto: \$(echo \$(kallisto 2>&1) | sed 's/^kallisto //; s/Usage.*\$//')
