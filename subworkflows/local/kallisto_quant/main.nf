@@ -30,5 +30,6 @@ workflow KALLISTO_QUANT {
     ch_versions = ch_versions.mix(KALLISTO_TCCQUANT.out.versions)
 
     emit:
-    versions = ch_versions // channel: [ versions.yml ]
+    versions       = ch_versions // channel: [ versions.yml ]
+    pseudo_results = KALLISTO_TCCQUANT.out.results // channel [val(meta), dir(results) ] 
 }

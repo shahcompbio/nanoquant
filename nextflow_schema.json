@@ -246,6 +246,20 @@
         "gtf": {
             "type": "string",
             "description": "transcriptome gtf"
+        },
+        "gtf_id_attribute": {
+            "type": "string",
+            "default": "gene_id",
+            "description": "Gene ID attribute in the GTF file"
+        },
+        "gtf_extra_attribute": {
+            "type": "string",
+            "default": "gene_name",
+            "description": "Extra gene attribute in the GTF file"
+        },
+        "merge_samples": {
+            "type": "boolean",
+            "description": "merge quantification results across samples"
         }
     }
 }

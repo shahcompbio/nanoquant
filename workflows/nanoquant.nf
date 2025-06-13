@@ -8,6 +8,7 @@ include { KALLISTO_INDEX         } from '../modules/nf-core/kallisto/index/main'
 include { BUSPARSE_TR2G          } from '../modules/local/busparse/tr2g/main'
 include { CAT_LRFASTQ            } from '../modules/local/cat/lrfastq/main'
 include { KALLISTO_QUANT         } from '../subworkflows/local/kallisto_quant/main'
+include { CUSTOM_TX2GENE         } from '../modules/nf-core/custom/tx2gene/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -60,6 +61,17 @@ workflow NANOQUANT {
         BUSPARSE_TR2G.out.gene_map,
     )
     ch_versions = ch_versions.mix(KALLISTO_QUANT.out.versions)
+    // merge results across samples if necessary
+    if (params.merge_samples) {
+        ch_pseudo_results = KALLISTO_QUANT.out.pseudo_results
+        CUSTOM_TX2GENE(
+            tuple([id: "transcriptome"], params.gtf),
+            ch_pseudo_results.collect { it[1] }.map { [[:], it] },
+            "kallisto",
+            params.gtf_id_attribute,
+            params.gtf_extra_attribute,
+        )
+    }
 
     //
     // Collate and save software versions
