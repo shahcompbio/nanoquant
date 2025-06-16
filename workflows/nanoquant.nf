@@ -70,7 +70,7 @@ workflow NANOQUANT {
             params.gtf,
             params.gtf_id_attribute,
             params.gtf_extra_attribute,
-            ch_samplesheet,
+            [[:], params.input],
         )
         ch_versions = ch_versions.mix(MERGE_QUANT.out.versions)
     }

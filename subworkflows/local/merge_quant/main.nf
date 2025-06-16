@@ -12,7 +12,7 @@ workflow MERGE_QUANT {
     gtf                 // channel: [gtf]
     gtf_id_attribute    //     val: GTF gene ID attribute
     gtf_extra_attribute //     val: GTF alternative gene attribute (e.g. gene_name)
-    samplesheet         // channel: [ val(meta), /path/to/samplsheet ]
+    samplesheet         // channel: [ val(meta), /path/to/samplesheet ]
 
     main:
 
@@ -41,13 +41,14 @@ workflow MERGE_QUANT {
         .join(TXIMETA_TXIMPORT.out.tpm_gene)
         .map { tuple(it[0], it.tail()) }
 
+    ch_gene_unified.view()
+
     SE_GENE_UNIFIED(
         ch_gene_unified,
         CUSTOM_TX2GENE.out.tx2gene,
         samplesheet,
     )
     ch_versions = ch_versions.mix(SE_GENE_UNIFIED.out.versions)
-
     ch_transcript_unified = TXIMETA_TXIMPORT.out.counts_transcript
         .join(TXIMETA_TXIMPORT.out.lengths_transcript)
         .join(TXIMETA_TXIMPORT.out.tpm_transcript)
