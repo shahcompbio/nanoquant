@@ -2,7 +2,6 @@
 process BUSTOOLS_COUNT {
     tag "${meta.id}"
     label 'process_single'
-    publishDir "kallisto/${meta.id}", mode: 'copy', overwrite: true
 
     conda "${moduleDir}/environment.yml"
     container "quay.io/biocontainers/bustools:0.43.2--he1fd2f9_1"
