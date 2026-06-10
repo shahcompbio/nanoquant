@@ -45,7 +45,6 @@ workflow NANOQUANT {
     // MODULE: Convert BAM/CRAM to FASTQ
     //
     SAMTOOLS_FASTQ(ch_input.bam, false)
-    ch_versions = ch_versions.mix(SAMTOOLS_FASTQ.out.versions_samtools.first())
 
     // Long reads lack READ1/READ2 flags so samtools routes them to the "other" output
     ch_fastq_input = ch_input.fastq.mix(SAMTOOLS_FASTQ.out.other)
