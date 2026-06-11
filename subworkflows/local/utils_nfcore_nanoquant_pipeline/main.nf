@@ -72,12 +72,15 @@ workflow PIPELINE_INITIALISATION {
     //
 
     Channel.fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-        .map { meta, fastq_1, fastq_dir ->
-            if (fastq_1 && !fastq_dir) {
-                return [meta.id, meta + [single_end: true], [fastq_1]]
+        .map { meta, fastq_1, fastq_dir, bam ->
+            if (bam) {
+                return [meta.id, meta + [single_end: true, input_type: 'bam'], [bam]]
+            }
+            else if (fastq_1 && !fastq_dir) {
+                return [meta.id, meta + [single_end: true, input_type: 'fastq'], [fastq_1]]
             }
             else if (!fastq_1 && fastq_dir) {
-                return [meta.id, meta + [single_end: false], [fastq_dir]]
+                return [meta.id, meta + [single_end: false, input_type: 'fastq'], [fastq_dir]]
             }
             else {
                 println("invalid input for ${meta.id}")

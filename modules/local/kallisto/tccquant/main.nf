@@ -2,7 +2,6 @@
 process KALLISTO_TCCQUANT {
     tag "${meta.id}"
     label 'process_medium'
-    publishDir "kallisto", mode: 'copy', overwrite: true
 
     // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
     conda "${moduleDir}/environment.yml"
