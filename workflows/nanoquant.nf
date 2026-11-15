@@ -5,6 +5,7 @@
 */
 include { GFFREAD                } from '../modules/nf-core/gffread/main'
 include { KALLISTO_INDEX         } from '../modules/nf-core/kallisto/index/main'
+include { SAMTOOLS_FASTQ         } from '../modules/nf-core/samtools/fastq/main'
 include { BUSPARSE_TR2G          } from '../modules/local/busparse/tr2g/main'
 include { CAT_LRFASTQ            } from '../modules/local/cat/lrfastq/main'
 include { KALLISTO_QUANT         } from '../subworkflows/local/kallisto_quant/main'
@@ -31,9 +32,24 @@ workflow NANOQUANT {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
     //
-    // MODULE: Run FastQC
+    // Branch input by type: BAM/CRAM vs FASTQ
     //
-    // ch_samplesheet.view()
+    ch_samplesheet
+        .branch { meta, reads ->
+            bam: meta.input_type == 'bam'
+            fastq: true
+        }
+        .set { ch_input }
+
+    //
+    // MODULE: Convert BAM/CRAM to FASTQ
+    //
+    SAMTOOLS_FASTQ(ch_input.bam, false)
+
+    // Long reads lack READ1/READ2 flags so samtools routes them to the "other" output
+    ch_fastq_input = ch_input.fastq.mix(SAMTOOLS_FASTQ.out.other)
+
+    //
     // extract cdna 
     GFFREAD(tuple([id: "cdna"], params.gtf), params.fasta)
     ch_versions = ch_versions.mix(GFFREAD.out.versions)
@@ -43,7 +59,7 @@ workflow NANOQUANT {
     // map transcripts to gene
     BUSPARSE_TR2G(tuple([id: "tr2g"], params.gtf))
     ch_versions = ch_versions.mix(BUSPARSE_TR2G.out.versions)
-    ch_samplesheet
+    ch_fastq_input
         .branch { meta, fastqs ->
             merged: meta.single_end == true
             unmerged: meta.single_end != true

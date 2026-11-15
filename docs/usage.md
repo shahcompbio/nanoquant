@@ -8,10 +8,55 @@
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with a header row as shown in the examples below.
 
 ```bash
 --input '[path to samplesheet file]'
+```
+
+### Starting from FASTQ files
+
+For samples with a single merged FASTQ file:
+
+```csv title="samplesheet.csv"
+sample,fastq_1
+SAMPLE1,/path/to/sample1.fastq.gz
+SAMPLE2,/path/to/sample2.fastq.gz
+```
+
+For samples with a directory of unmerged FASTQ files (e.g. multiple passes):
+
+```csv title="samplesheet.csv"
+sample,fastq_dir
+SAMPLE1,/path/to/sample1_fastqs/
+SAMPLE2,/path/to/sample2_fastqs/
+```
+
+### Starting from BAM/CRAM files
+
+The pipeline can also start from aligned BAM or CRAM files, which will be converted to FASTQ prior to quantification with kallisto. This is useful when upstream read filtering has been applied to aligned data (e.g. removal of chimeric reads, short fragments, or low-quality alignments) and you want to quantify only the filtered read set.
+
+```csv title="samplesheet.csv"
+sample,bam
+SAMPLE1,/path/to/filtered_reads.cram
+SAMPLE2,/path/to/filtered_reads.bam
+```
+
+#### Rationale for BAM/CRAM to FASTQ conversion
+
+In long-read transcriptomics workflows, it is common to perform quality-based filtering on aligned reads before transcript assembly (e.g. using SQANTI-based filtering to remove chimeric reads, RT-switching artifacts, or other sequencing artifacts). When the same filtered read set is used for both transcript assembly and quantification, the resulting counts are consistent with the assembled transcriptome. Starting from the filtered BAM/CRAM files — rather than re-filtering at the FASTQ stage — ensures this consistency and avoids duplicating filtering logic across pipelines.
+
+The conversion uses `samtools fastq` to extract sequences and quality scores from the aligned reads. Since long-read alignments do not carry paired-end flags (READ1/READ2), samtools routes all reads to its "other" category output. Supplementary and secondary alignments are excluded by default (`-F 0x900`) to ensure each read appears only once. For CRAM files, the reference genome (`--reference`) is required for decompression.
+
+### Mixed input types
+
+You can mix input types in the same samplesheet — some samples from FASTQ and others from BAM/CRAM:
+
+```csv title="samplesheet.csv"
+sample,fastq_1,fastq_dir,bam
+SAMPLE1,/path/to/sample1.fastq.gz,,
+SAMPLE2,,,/path/to/filtered.cram
+SAMPLE3,,/path/to/fastq_dir/,
 ```
 
 ### Multiple runs of the same sample
@@ -19,34 +64,20 @@ You will need to create a samplesheet with information about the samples you wou
 The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
+sample,fastq_1
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 ```
 
-### Full samplesheet
+### Samplesheet columns
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
-
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
-
-```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
-```
-
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| Column     | Description                                                                                                                                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`   | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
+| `fastq_1`  | Full path to a single merged long-read FASTQ file. Must be gzipped with extension `.fq.gz` or `.fastq.gz`.                                                                            |
+| `fastq_dir`| Full path to a directory containing unmerged FASTQ files for a sample.                                                                                                                 |
+| `bam`      | Full path to an aligned BAM (`.bam`) or CRAM (`.cram`) file. Will be converted to FASTQ before quantification.                                                                        |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 

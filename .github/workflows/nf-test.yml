@@ -73,13 +73,11 @@ jobs:
       fail-fast: false
       matrix:
         shard: ${{ fromJson(needs.nf-test-changes.outputs.shard) }}
-        profile: [conda, docker, singularity]
+        profile: [docker, singularity] # conda not supported
         isMain:
           - ${{ github.base_ref == 'master' || github.base_ref == 'main' }}
-        # Exclude conda and singularity on dev
+        # Exclude singularity on dev
         exclude:
-          - isMain: false
-            profile: "conda"
           - isMain: false
             profile: "singularity"
         NXF_VER:
@@ -100,6 +98,7 @@ jobs:
           NFT_DIFF: ${{ env.NFT_DIFF }}
           NFT_DIFF_ARGS: ${{ env.NFT_DIFF_ARGS }}
           NFT_WORKDIR: ${{ env.NFT_WORKDIR }}
+          NXF_VERSION: ${{ matrix.NXF_VER }}
         with:
           profile: ${{ matrix.profile }}
           shard: ${{ matrix.shard }}

@@ -13,38 +13,38 @@
 
 ## Introduction
 
-**shahcompbio/nanoquant** is a bioinformatics pipeline that ...
+**shahcompbio/nanoquant** is a bioinformatics pipeline for long-read transcriptome quantification using kallisto. It takes Oxford Nanopore or PacBio long-read RNA-seq data (as FASTQ, BAM, or CRAM files) and performs pseudoalignment-based transcript and gene-level quantification using the kallisto bus workflow optimized for long reads.
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
-
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+1. Optional BAM/CRAM to FASTQ conversion ([`samtools`](http://www.htslib.org/))
+2. Extract cDNA sequences from genome + annotation ([`gffread`](http://ccb.jhu.edu/software/stringtie/gff.shtml))
+3. Build kallisto index and quantify ([`kallisto`](https://pachterlab.github.io/kallisto/))
+4. Merge quantification results across samples
+5. Present QC ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
-
 First, prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+sample,fastq_1
+SAMPLE1,/path/to/sample1.fastq.gz
+SAMPLE2,/path/to/sample2.fastq.gz
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+Or starting from filtered BAM/CRAM files:
 
--->
+```csv
+sample,bam
+SAMPLE1,/path/to/filtered_reads.cram
+SAMPLE2,/path/to/filtered_reads.bam
+```
+
+Each row represents a sample. See [usage docs](docs/usage.md) for full details on input types.
 
 Now, you can run the pipeline using:
 

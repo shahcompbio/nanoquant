@@ -20,6 +20,11 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Setup Java # runner default (25) breaks nf-test's Groovy
+      uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+      with:
+        distribution: temurin
+        java-version: "17"
     - name: Install nf-test
       uses: nf-core/setup-nf-test@v1
       with:

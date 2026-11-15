@@ -2,7 +2,6 @@
 process BUSTOOLS_SORT {
     tag "${meta.id}"
     label 'process_medium'
-    publishDir "kallisto/${meta.id}", mode: 'copy', overwrite: true
 
     conda "${moduleDir}/environment.yml"
     container "quay.io/biocontainers/bustools:0.43.2--he1fd2f9_1"
