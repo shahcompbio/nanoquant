@@ -36,7 +36,7 @@ template:
   name: nanoquant
   description: quantify expression & splicing in bulk, ONT RNAseq data
   author: Asher Preska Steinberg
-  version: 1.0.0dev
+  version: 1.0.1
   force: true
   outdir: .
   is_nfcore: false

@@ -141,10 +141,10 @@
             },
             "url": [
                 "https://github.com/shahcompbio/nanoquant",
-                "https://nf-co.re/shahcompbio/nanoquant/dev/"
+                "https://nf-co.re/shahcompbio/nanoquant/1.0.1/"
             ],
             "version": [
-                "1.0.0dev"
+                "1.0.1"
             ]
         },
         {
