@@ -26,6 +26,13 @@
                 "exists": true,
                 "pattern": "^\\S+$",
                 "errorMessage": "directory of unmerged FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "bam": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.(bam|cram)$",
+                "errorMessage": "BAM/CRAM file must be provided, cannot contain spaces and must have extension '.bam' or '.cram'"
             }
         },
        "required": ["sample"],
@@ -35,6 +42,9 @@
             },
             {
                 "required": ["fastq_dir"]
+            },
+            {
+                "required": ["bam"]
             }
         ]
     }
